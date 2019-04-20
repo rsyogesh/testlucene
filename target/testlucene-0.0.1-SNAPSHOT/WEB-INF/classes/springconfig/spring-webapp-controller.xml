@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:webflow="http://www.springframework.org/schema/webflow-config"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/webflow-config
+           http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.0.xsd"
+        >
+  <!-- webflow Entry point -->
+    <webflow:flow-executor id="flowExecutor" flow-registry="flowRegistry">
+        <webflow:flow-execution-repository max-executions="5" max-execution-snapshots="30"/>
+    </webflow:flow-executor>
+
+    <webflow:flow-registry id="flowRegistry" flow-builder-services="flowBuilderServices">
+     <webflow:flow-location path= "/WEB-INF/flow/login.xml" />
+     <webflow:flow-location path= "/WEB-INF/flow/forgotName.xml" />
+     <webflow:flow-location path= "/WEB-INF/flow/welcome.xml" />
+     <webflow:flow-location path= "/WEB-INF/flow/Manager.xml" />
+     <webflow:flow-location path= "/WEB-INF/flow/User.xml" />
+     <webflow:flow-location path= "/WEB-INF/flow/Register.xml" />
+    </webflow:flow-registry>
+
+    <webflow:flow-builder-services id="flowBuilderServices" view-factory-creator="mvcViewFactoryCreator"/>
+
+   <bean id="mvcViewFactoryCreator"  class="org.springframework.webflow.mvc.builder.MvcViewFactoryCreator">
+       <property name="viewResolvers"  ref="viewResolverjs" />
+
+   </bean>
+
+    <bean id="viewResolverjs" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <property name="prefix" value="/WEB-INF/jsp/"/>
+    <property name="suffix" value="*.jsp"/>
+    </bean>
+
+<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <value>messages/errors</value>
+        </property>
+    </bean>
+    
+
+    <bean class="org.springframework.webflow.mvc.servlet.FlowHandlerAdapter">
+        <property name="flowExecutor" ref="flowExecutor" />
+        </bean>
+
+    <bean id="simpleUrlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+            <prop key="/login.do">loginflowhandler</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <bean id="loginflowhandler" class="com.spring.webflow.sample.flowhandler.loginflowhandler"/>
+    <bean id="loginValidator" class="com.spring.webflow.sample.validator.LoginValidator">
+        <property name="loginCredential">
+	   <map>
+	    <entry key="excelacom" value="excelacom"/>
+      </map>
+	  </property>
+    </bean>
+    
+    <bean id="welcomeController" class="com.spring.webflow.sample.controller.welcomeController" />
+    <bean id="userobj" class="com.spring.webflow.sample.beanmodel.User" />
+    <bean id="userController" class="com.spring.webflow.sample.controller.userController" >
+    <property name="user" ref="userobj">
+	   
+	  </property>
+    </bean>
+    <bean id="managerController" class="com.spring.webflow.sample.controller.welcomeController" />
+    <bean id="logincontroller" class="com.spring.webflow.sample.controller.logincontroller" />
+    <bean id="forgotFormValidator" class="com.spring.webflow.sample.validator.ForgotNameValidator">
+    <property name="forgotCredential">
+	   <list>
+          <value>aircell</value>
+	   </list>
+	  </property>
+    </bean>
+    <bean id="forgotController" class="com.spring.webflow.sample.controller.forgotController" />
+
+</beans>
